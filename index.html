@@ -1,0 +1,1798 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vaxilink â€” Routine Immunization & Cold-Chain Platform</title>
+<style>
+:root{
+  --ink:#102a36;--muted:#627882;--line:#dbe5e7;--bg:#f2f6f7;--white:#fff;
+  --teal:#087f8c;--teal-dark:#055963;--teal-light:#dff4f2;--teal-glow:#35c2b1;
+  --blue:#eaf1fc;--blue-ink:#2554a5;
+  --orange:#fff0d6;--orange-ink:#9e5b00;
+  --red:#fde7e7;--red-ink:#b82c2a;
+  --green:#e2f6e9;--green-ink:#1b733b;
+  --purple:#f3e8ff;--purple-ink:#6b21a8;
+  --shadow:0 8px 30px rgba(16,42,54,0.06);
+  --shadow-lg:0 16px 48px rgba(16,42,54,0.12);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0;border-radius:10px;padding:9px 15px;font-weight:650;background:var(--teal);color:white;transition:all .15s ease}
+button:hover{background:var(--teal-dark)}
+button.secondary{background:#edf3f4;color:var(--ink);border:1px solid var(--line)}
+button.secondary:hover{background:#e2ecee}
+button.danger{background:#d93835;color:white}
+button.danger:hover{background:#b82623}
+button.small{padding:5px 10px;font-size:12px;border-radius:8px}
+button:disabled{opacity:.45;cursor:not-allowed}
+
+.shell{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+.sidebar{background:#0e2936;color:white;padding:24px 16px;display:flex;flex-direction:column;gap:20px}
+.brand{display:flex;gap:11px;align-items:center;font-size:21px;font-weight:850;letter-spacing:-.8px}
+.logo{background:var(--teal-glow);color:#082a32;border-radius:12px;width:38px;height:38px;display:grid;place-items:center;font-size:22px;font-weight:900}
+.side-label{color:#82a3ac;font-size:10px;text-transform:uppercase;letter-spacing:1.4px;padding:0 10px}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav button{display:flex;gap:12px;align-items:center;text-align:left;background:transparent;color:#b2c7cc;font-weight:600;padding:11px 13px;border-radius:10px}
+.nav button.active,.nav button:hover{background:#1d4250;color:#fff}
+.nav button .badge-count{margin-left:auto;background:#2d5867;color:#a5d8d0;font-size:10px;padding:2px 7px;border-radius:999px;font-weight:700}
+.side-foot{margin-top:auto;color:#8fa7af;font-size:11px;line-height:1.4;padding:10px;border-top:1px solid #1a3c4a}
+
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px;gap:16px}
+.crumb{color:var(--muted);font-size:12px}
+.top-title{font-weight:800;font-size:18px;letter-spacing:-.3px}
+.top-actions{display:flex;align-items:center;gap:12px}
+.pill{border-radius:999px;padding:5px 11px;font-size:11px;font-weight:750;display:inline-flex;align-items:center;gap:6px}
+.pill.live{background:var(--green);color:var(--green-ink)}
+.pill.offline{background:#edf2f4;color:var(--muted)}
+.pill.excursion-banner{background:#fde3e1;color:#b82623;font-weight:800;border:1px solid #f6b5b2}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--teal-light);color:var(--teal);display:grid;place-items:center;font-weight:800;font-size:13px}
+
+.content{padding:28px 32px;max-width:1600px;margin:0 auto;width:100%}
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px}
+.eyebrow{font-size:11px;color:var(--teal);font-weight:800;text-transform:uppercase;letter-spacing:1.3px}
+.h1{font-size:27px;letter-spacing:-.8px;font-weight:850;margin:4px 0 6px}
+.sub{color:var(--muted);max-width:700px;font-size:13px}
+
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:18px}
+.card{background:white;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow);min-width:0}
+.kpi-top{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;font-weight:600}
+.kpi-value{font-size:30px;font-weight:850;letter-spacing:-1px;margin:9px 0 4px}
+.kpi-note{font-size:11px;color:var(--muted)}
+.kpi-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--teal-light);color:var(--teal);font-size:17px}
+.two-col{grid-template-columns:1.5fr 1fr}
+.three-col{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.card-title{font-weight:800;font-size:15px}
+.card-sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+.legend{display:flex;gap:13px;color:var(--muted);font-size:11px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.chart{height:220px;width:100%;display:block}
+
+.progress{height:7px;background:#edf2f3;border-radius:99px;overflow:hidden}
+.progress span{display:block;height:100%;border-radius:99px;background:var(--teal)}
+.table-wrap{overflow:auto}
+table{border-collapse:collapse;width:100%;white-space:nowrap}
+th{text-align:left;color:#6b8087;font-size:10px;text-transform:uppercase;letter-spacing:.8px;padding:12px 10px;border-bottom:1px solid var(--line)}
+td{padding:12px 10px;border-bottom:1px solid #edf1f2;font-size:12px}
+tbody tr:hover{background:#fafcfc}
+tbody tr:last-child td{border-bottom:0}
+
+.status{display:inline-flex;align-items:center;border-radius:999px;padding:3px 9px;font-size:10px;font-weight:800;gap:4px}
+.status.due{background:var(--orange);color:var(--orange-ink)}
+.status.overdue{background:var(--red);color:var(--red-ink)}
+.status.upcoming{background:var(--blue);color:var(--blue-ink)}
+.status.done{background:var(--green);color:var(--green-ink)}
+.status.quarantine{background:#ffd7d5;color:#b01f1c;font-weight:850;border:1px solid #f99f9c}
+
+/* VVM Graphic Badges */
+.vvm-icon{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700}
+.vvm-circle{width:22px;height:22px;border-radius:50%;background:#5c3c88;display:grid;place-items:center;flex-shrink:0}
+.vvm-circle.stage-1 .vvm-square{background:#ffffff}
+.vvm-circle.stage-2 .vvm-square{background:#cbb7df}
+.vvm-circle.stage-3 .vvm-square{background:#5c3c88}
+.vvm-circle.stage-4 .vvm-square{background:#261042}
+.vvm-square{width:9px;height:9px}
+
+.feed{display:flex;flex-direction:column;gap:13px}
+.feed-item{display:flex;gap:12px;align-items:flex-start}
+.feed-icon{width:32px;height:32px;border-radius:10px;background:#eef6f6;display:grid;place-items:center;flex-shrink:0;font-size:14px}
+.feed-item strong{display:block;font-size:12px}
+.feed-item small{color:var(--muted);font-size:11px}
+.section{margin-top:18px}
+
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label{font-size:11px;color:var(--muted);font-weight:750}
+.field input,.field select,.field textarea{border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:white;color:var(--ink);min-width:0}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid #a7e2dc;border-color:var(--teal)}
+
+.reminder-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+.rule{display:flex;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #edf1f2;align-items:center}
+.rule strong{font-size:12px;display:block}
+.rule small{color:var(--muted);font-size:11px}
+
+.switch{position:relative;width:37px;height:21px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:#cbd7da;border-radius:99px;transition:.2s;cursor:pointer}
+.slider:before{content:"";position:absolute;width:15px;height:15px;left:3px;top:3px;border-radius:50%;background:white;transition:.2s}
+.switch input:checked+.slider{background:var(--teal)}
+.switch input:checked+.slider:before{transform:translateX(16px)}
+
+/* Map & Provider */
+.map{background:#f0f7f7;border:1px solid var(--line);border-radius:13px;min-height:260px;position:relative;overflow:hidden;padding:15px}
+.map svg{width:100%;height:260px}
+.node{fill:white;stroke:#a9c6c9;stroke-width:2}
+.node-hub{fill:#087f8c;stroke:#087f8c}
+.link{stroke:#80b7ba;stroke-width:2;stroke-dasharray:6 7;animation:dash 3s linear infinite}
+.shipment{fill:#f5a623;animation:move 4s ease-in-out infinite alternate}
+@keyframes dash{to{stroke-dashoffset:-26}}
+@keyframes move{to{transform:translate(18px,8px)}}
+
+.facility-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.facility{border:1px solid var(--line);border-radius:12px;padding:13px;transition:all .2s ease}
+.facility.excursion-active{border:2px solid #e5484d;background:#fff5f5;box-shadow:0 0 14px rgba(229,72,77,0.15)}
+.facility strong{font-size:12px;display:block}
+.facility small{font-size:10px;color:var(--muted)}
+.facility .temp{font-size:20px;font-weight:850;margin:6px 0}
+
+/* Modals */
+.modal-backdrop{position:fixed;inset:0;background:#0d2530a6;display:none;align-items:center;justify-content:center;padding:18px;z-index:100;backdrop-filter:blur(3px)}
+.modal-backdrop.open{display:flex}
+.modal{width:min(760px,100%);max-height:92vh;overflow:auto;background:white;border-radius:18px;padding:26px;box-shadow:var(--shadow-lg)}
+.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:18px;border-bottom:1px solid var(--line);padding-bottom:14px}
+.modal-title{font-size:20px;font-weight:850;letter-spacing:-.4px}
+.close{background:#edf3f4;color:var(--ink);padding:6px 12px;border-radius:8px}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid .full{grid-column:1/-1}
+
+.stepper{display:flex;gap:6px;margin:14px 0 22px}
+.step{height:4px;border-radius:99px;background:#e3ebed;flex:1}
+.step.active{background:var(--teal)}
+
+.vaccine-options{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.vax-option{border:1px solid var(--line);background:white;color:var(--ink);text-align:left;padding:14px;border-radius:12px}
+.vax-option.selected{border:2px solid var(--teal);background:#f0fbf9}
+.vax-option strong{display:block;font-size:13px}
+.vax-option small{color:var(--muted);font-size:11px}
+
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.slot{border:1px solid var(--line);background:white;color:var(--ink);padding:10px}
+.slot.selected{border:2px solid var(--teal);background:var(--teal-light)}
+
+.toast{position:fixed;right:22px;bottom:22px;background:#15333f;color:white;padding:13px 18px;border-radius:12px;box-shadow:var(--shadow-lg);z-index:200;display:none;max-width:380px;font-size:13px}
+.notice{padding:12px 14px;background:#fff8e8;border:1px solid #f3e0b5;border-radius:10px;font-size:12px;color:#7e5b1b;margin-bottom:15px}
+.alert-banner{padding:12px 16px;background:#fde8e7;border:1px solid #f8b4b1;border-radius:12px;margin-bottom:16px;color:#9c1c1a;display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:600}
+
+/* Digital MCP Certificate Styles */
+.mcp-passport{border:2px solid #087f8c;border-radius:16px;padding:24px;background:#ffffff;position:relative;background-image:radial-gradient(#087f8c0a 1px, transparent 1px);background-size:18px 18px}
+.mcp-header{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #087f8c;padding-bottom:14px;margin-bottom:16px}
+.mcp-emblem{display:flex;align-items:center;gap:12px}
+.mcp-qr{width:96px;height:96px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px}
+.mcp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;background:#f8fbfc;padding:14px;border-radius:10px}
+.mcp-field strong{display:block;font-size:13px;color:var(--ink)}
+.mcp-field span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+.mcp-seal{display:inline-flex;align-items:center;gap:6px;border:1px dashed #087f8c;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:750;color:#087f8c}
+
+@media print{
+  body *{visibility:hidden}
+  .mcp-passport, .mcp-passport *{visibility:visible}
+  .mcp-passport{position:fixed;left:0;top:0;width:100%;border:none}
+  .no-print{display:none!important}
+}
+
+.coverage-row{display:grid;grid-template-columns:130px 1fr 40px;gap:12px;align-items:center;margin:13px 0;font-size:12px}
+.coverage-row .progress{height:8px}
+.hidden{display:none!important}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.small-muted{font-size:11px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <div class="brand"><div class="logo">âœš</div> Vaxilink</div>
+  <div class="side-label">National Network</div>
+  <nav class="nav" id="nav">
+    <button class="active" data-page="overview">â—« &nbsp; Overview</button>
+    <button data-page="children">â™§ &nbsp; Children registry</button>
+    <button data-page="asha">ðŸ‘¥ &nbsp; ASHA / ANM Portal <span class="badge-count" id="ashaCount">4</span></button>
+    <button data-page="reminders">â—· &nbsp; Dose reminders</button>
+    <button data-page="booking">ï¼‹ &nbsp; Book a dose</button>
+    <button data-page="network">âŒ˜ &nbsp; Provider network</button>
+    <button data-page="inventory">â–¤ &nbsp; Stock & VVM chain</button>
+  </nav>
+  <div class="side-foot">
+    <strong style="color:#d5e5e9">Vaxilink v2.0 Enterprise</strong><br>
+    Universal Immunization Programme Â· Routine Under-5<br><br>
+    <span id="serverBadge">Connecting to backend...</span>
+  </div>
+</aside>
+
+<main class="main">
+<header class="topbar">
+  <div>
+    <div class="crumb">Vaxilink / <span id="crumb">Overview</span></div>
+    <div class="top-title" id="topTitle">National routine immunization overview</div>
+  </div>
+  <div class="top-actions">
+    <span class="pill live" id="livePill">â— SERVER LIVE (REST API)</span>
+    <div class="avatar">VL</div>
+  </div>
+</header>
+
+<div class="content">
+  <div id="excursionGlobalAlert" class="alert-banner hidden">
+    <div>
+      <strong>âš ï¸ COLD-CHAIN TEMPERATURE EXCURSION ACTIVE</strong><br>
+      <span id="excursionText">Facility exceeded +8.0Â°C safety threshold. Automatic lot quarantine protocol engaged.</span>
+    </div>
+    <button class="small secondary" onclick="showPage('inventory')">Inspect Cold Storage â†’</button>
+  </div>
+
+  <!-- PAGE 1: OVERVIEW -->
+  <section id="page-overview" class="page">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Routine childhood immunization Â· Under 5</div>
+        <div class="h1">Immunization Operations Command</div>
+        <div class="sub">National overview of childhood vaccine coverage, appointment demand, and cold-chain integrity.</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="openBooking()">ï¼‹ New child booking</button>
+      </div>
+    </div>
+    <div class="grid kpis" id="kpis"></div>
+    <div class="grid two-col">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Doses administered Â· 14-day trend</div>
+            <div class="card-sub">Scheduled visits vs. proactive catch-up campaigns</div>
+          </div>
+          <div class="legend">
+            <span><i class="dot" style="background:#087f8c"></i>Scheduled</span>
+            <span><i class="dot" style="background:#7ea2e6"></i>Catch-up</span>
+          </div>
+        </div>
+        <svg class="chart" id="trendChart" viewBox="0 0 640 220" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Coverage by antigen (Cohort)</div>
+            <div class="card-sub">Universal Immunization Programme schedule</div>
+          </div>
+          <span class="pill live">WHO DAK</span>
+        </div>
+        <div id="coverageBars"></div>
+      </div>
+    </div>
+
+    <div class="grid two-col section">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Due & overdue children (Priority follow-up)</div>
+            <div class="card-sub">Children requiring ASHA outreach or clinic visit</div>
+          </div>
+          <button class="secondary small" onclick="showPage('children')">Full registry â†’</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Child / U-WIN ID</th><th>Next dose</th><th>Due date</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="duePreview"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Live system activity</div>
+            <div class="card-sub">Real-time audit log of bookings, transfers and cold-chain events</div>
+          </div>
+          <span class="pill live">Live</span>
+        </div>
+        <div class="feed" id="activityFeed"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 2: CHILDREN REGISTRY & MCP PASSPORT -->
+  <section id="page-children" class="page hidden">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Citizen portal Â· Beneficiary directory</div>
+        <div class="h1">Children Registry & Digital MCP Cards</div>
+        <div class="sub">Manage enrolled infants, schedule progression, verified administration histories, and official U-WIN/Co-WIN certificates.</div>
+      </div>
+      <button onclick="openBooking()">ï¼‹ Enroll new infant</button>
+    </div>
+    <div class="card">
+      <div class="filter-row">
+        <div class="field" style="flex:1">
+          <label>Search child, caregiver, phone, or U-WIN ID</label>
+          <input id="childSearch" placeholder="E.g. Aarav, Meera, UWIN-MH..." oninput="renderChildren()">
+        </div>
+        <div class="field">
+          <label>Vaccination status</label>
+          <select id="statusFilter" onchange="renderChildren()">
+            <option value="all">All statuses</option>
+            <option>Overdue</option>
+            <option>Due soon</option>
+            <option>Upcoming</option>
+            <option>Booked</option>
+            <option>Done (Up to date)</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Child / Beneficiary</th>
+              <th>Caregiver & Phone</th>
+              <th>Age</th>
+              <th>Next due dose</th>
+              <th>Due date</th>
+              <th>Status</th>
+              <th>Digital MCP Card</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="childrenTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 3: ASHA / ANM WORKSPACE -->
+  <section id="page-asha" class="page hidden">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Frontline Health Worker Â· Field Operations</div>
+        <div class="h1">ASHA & ANM Catchment Portal</div>
+        <div class="sub">Conduct home visits, counsel hesitant caregivers, record delay reasons, and administer vaccines on Village Health Sanitation & Nutrition Days (VHSND).</div>
+      </div>
+      <div class="pill live">Ward 4 Â· Shivaji & Rural Sector</div>
+    </div>
+
+    <div class="grid kpis" id="ashaKpis"></div>
+
+    <div class="grid two-col">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Priority Follow-up Task List</div>
+            <div class="card-sub">Children flagged for home counseling or overdue catch-up</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Child / Task</th><th>Dose</th><th>Urgency</th><th>Last visit / Reason</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="ashaTaskTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Field Guidelines & Cold-Chain Checklist</div>
+            <div class="card-sub">WHO / UIP SOP for vaccine carriers</div>
+          </div>
+        </div>
+        <div class="notice">
+          <strong>Cold-Box Protocol for Village Sessions:</strong>
+          <ul style="margin:6px 0 0;padding-left:20px;line-height:1.6">
+            <li>Condition ice packs: wait until water droplets form on ice packs before placing in carrier.</li>
+            <li>Inspect Vaccine Vial Monitor (VVM) on every vial before opening (Use only Stage 1 & 2).</li>
+            <li>Discard reconstituted BCG and Measles-Rubella vials after 4 hours of opening.</li>
+            <li>Always record batch lot numbers and caregiver contact commitments.</li>
+          </ul>
+        </div>
+        <div style="margin-top:14px">
+          <strong>Assigned Frontline Teams:</strong>
+          <div class="rule" style="margin-top:8px">
+            <div><strong>Sunita Kadam (ASHA Worker)</strong><small>Catchment: Ward 4 (Shivaji Clinic) Â· 28 Children</small></div>
+            <span class="pill live">Active</span>
+          </div>
+          <div class="rule">
+            <div><strong>Laxmi Salve (ASHA Worker)</strong><small>Catchment: Rural Sector 1 Â· 34 Children</small></div>
+            <span class="pill live">Active</span>
+          </div>
+          <div class="rule">
+            <div><strong>Geeta Shinde (ASHA Worker)</strong><small>Catchment: Ward 2 (Pune Central) Â· 19 Children</small></div>
+            <span class="pill live">Active</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 4: DOSE REMINDERS -->
+  <section id="page-reminders" class="page hidden">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Caregiver Engagement & Behavioral Nudges</div>
+        <div class="h1">Automated Reminders & Multi-Channel Alerts</div>
+        <div class="sub">Configure scheduled notifications, manual simulated calls/SMS, and track delivery logs across vernacular Indian languages.</div>
+      </div>
+      <button onclick="runDueAlerts()">Run due-alert check</button>
+    </div>
+    <div class="reminder-grid">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Configured Alert Automation Rules</div>
+            <div class="card-sub">Triggers executed against scheduled due dates</div>
+          </div>
+        </div>
+        <div class="rule">
+          <div><strong>SMS Â· 3 days before due date</strong><small>Gentle appointment reminder in preferred language</small></div>
+          <label class="switch"><input type="checkbox" id="rulePre" checked><span class="slider"></span></label>
+        </div>
+        <div class="rule">
+          <div><strong>Call Â· On due date</strong><small>Automated IVR confirmation call</small></div>
+          <label class="switch"><input type="checkbox" id="ruleDue" checked><span class="slider"></span></label>
+        </div>
+        <div class="rule">
+          <div><strong>Call + SMS Â· Missed dose sequence</strong><small>Immediate follow-up if visit is overdue by >2 days</small></div>
+          <label class="switch"><input type="checkbox" id="ruleMissed" checked><span class="slider"></span></label>
+        </div>
+        <div class="rule">
+          <div><strong>Auto-Escalate to ASHA Field Worker</strong><small>Queues home-visit task if overdue reaches 5 days</small></div>
+          <label class="switch"><input type="checkbox" id="ruleAsha" checked><span class="slider"></span></label>
+        </div>
+        <div class="section">
+          <label class="field">
+            <label>Caregiver default broadcast language</label>
+            <select id="language"><option>Marathi</option><option>Hindi</option><option>English</option><option>Bengali</option><option>Tamil</option><option>Telugu</option></select>
+          </label>
+        </div>
+        <div class="section"><button class="secondary" onclick="saveRules()">Save reminder configuration</button></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Caregiver Direct Contact Queue</div>
+            <div class="card-sub">Instant manual outreach for high-priority infants</div>
+          </div>
+        </div>
+        <div id="contactQueue"></div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Audit Communication Log</div>
+          <div class="card-sub">Chronological history of all automated and manual caregiver alerts</div>
+        </div>
+        <button class="secondary small" onclick="clearLog()">Clear audit log</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Time</th><th>Recipient</th><th>Channel</th><th>Target / Phone</th><th>Message / Outcome</th><th>Status</th></tr></thead>
+          <tbody id="commLog"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 5: BOOKING FLOW -->
+  <section id="page-booking" class="page hidden">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Citizen portal Â· Schedule vaccination</div>
+        <div class="h1">Book a Childhood Vaccination</div>
+        <div class="sub">5-step flow with live FEFO batch stock allocation and date-of-birth dose calculation.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="stepper">
+        <div class="step active" id="st1"></div>
+        <div class="step" id="st2"></div>
+        <div class="step" id="st3"></div>
+        <div class="step" id="st4"></div>
+        <div class="step" id="st5"></div>
+      </div>
+      <div id="bookingStep"></div>
+    </div>
+  </section>
+
+  <!-- PAGE 6: PROVIDER DISTRIBUTION NETWORK -->
+  <section id="page-network" class="page hidden">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Provider Logistics Â· Multi-Tier Supply Chain</div>
+        <div class="h1">National Cold-Chain Distribution Network</div>
+        <div class="sub">Monitor active vaccine shipments across national hubs, regional depots, and frontline PHC clinics.</div>
+      </div>
+      <button onclick="openTransfer()">ï¼‹ Create Inter-facility transfer</button>
+    </div>
+    <div class="grid kpis" id="networkKpis"></div>
+    <div class="grid two-col">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">National Distribution Topology</div>
+            <div class="card-sub">Real-time simulated transfer transit paths</div>
+          </div>
+          <span class="pill live">3 Tiers</span>
+        </div>
+        <div class="map">
+          <svg viewBox="0 0 600 270">
+            <path class="link" d="M300 48 L145 115 M300 48 L455 115 M145 115 L95 210 M145 115 L230 210 M455 115 L375 210 M455 115 L510 210"/>
+            <circle class="shipment" cx="250" cy="70" r="5"/>
+            <circle class="shipment" cx="410" cy="138" r="5"/>
+            <circle class="shipment" cx="170" cy="165" r="5"/>
+            <rect class="node-hub" x="245" y="20" width="110" height="42" rx="10"/>
+            <text x="300" y="38" fill="white" text-anchor="middle" font-size="11" font-weight="700">National Hub</text>
+            <text x="300" y="51" fill="#dff7f4" text-anchor="middle" font-size="9">Pune Central Depot</text>
+            <rect class="node" x="90" y="92" width="110" height="42" rx="10"/>
+            <text x="145" y="110" text-anchor="middle" fill="#173744" font-size="10" font-weight="700">West Regional Store</text>
+            <rect class="node" x="400" y="92" width="110" height="42" rx="10"/>
+            <text x="455" y="110" text-anchor="middle" fill="#173744" font-size="10" font-weight="700">Central Regional Store</text>
+            <rect class="node" x="45" y="190" width="100" height="38" rx="9"/><text x="95" y="213" text-anchor="middle" fill="#173744" font-size="10">Shivaji Clinic</text>
+            <rect class="node" x="180" y="190" width="100" height="38" rx="9"/><text x="230" y="213" text-anchor="middle" fill="#173744" font-size="10">Pune Clinic</text>
+            <rect class="node" x="325" y="190" width="100" height="38" rx="9"/><text x="375" y="213" text-anchor="middle" fill="#173744" font-size="10">Rural PHC</text>
+            <rect class="node" x="460" y="190" width="100" height="38" rx="9"/><text x="510" y="213" text-anchor="middle" fill="#173744" font-size="10">Sub-Centre 4</text>
+          </svg>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Live Transfer Consignment Tracker</div>
+            <div class="card-sub">In-transit batches and simulated progress</div>
+          </div>
+          <button class="secondary small" onclick="advanceTransfers()">Advance simulation â†—</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Route</th><th>Vaccine</th><th>Doses</th><th>Progress</th><th>Status</th></tr></thead>
+            <tbody id="transferTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 7: STOCK & VVM COLD CHAIN -->
+  <section id="page-inventory" class="page hidden">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Cold-Chain Telemetry & FEFO Batch Inventory</div>
+        <div class="h1">Stock, VVM Stages & Temperature Alarms</div>
+        <div class="sub">Vial-level heat damage monitoring (VVM Stages 1â€“4), First-Expiry-First-Out batch management, and real-time sensor excursion simulators.</div>
+      </div>
+      <button onclick="openRestock()">ï¼‹ Add / Restock Batch</button>
+    </div>
+
+    <div class="grid kpis" id="inventoryKpis"></div>
+
+    <div class="card section">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Cold Storage Facilities & Temperature Sensor Simulator</div>
+          <div class="card-sub">Target refrigerator range: +2.0Â°C to +8.0Â°C. Test temperature excursions below.</div>
+        </div>
+      </div>
+      <div class="facility-grid" id="coldTable"></div>
+    </div>
+
+    <div class="card section">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Batch-Level Inventory & Vaccine Vial Monitor (VVM) Status</div>
+          <div class="card-sub">Sorted by FEFO (First-Expiry-First-Out). VVM Stages 3 & 4 are strictly quarantined.</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Batch Number</th>
+              <th>Vaccine Name</th>
+              <th>Facility Location</th>
+              <th>Available Doses</th>
+              <th>Expiry Date</th>
+              <th>VVM Stage & Quality</th>
+              <th>Quarantine Status</th>
+            </tr>
+          </thead>
+          <tbody id="batchTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+</main>
+</div>
+
+<!-- MODAL POPUP WRAPPER -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalContainer">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="modalTitle">Details</div>
+        <div class="small-muted" id="modalSub"></div>
+      </div>
+      <button class="close" onclick="closeModal()">âœ•</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const today = new Date('2026-10-24T00:00:00');
+const addDays = (d, n) => { let x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const dateISO = d => { let x = new Date(d); return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`; };
+const fmtDate = d => new Date(d+'T12:00:00').toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+const dayDiff = d => Math.round((new Date(d+'T00:00:00') - today)/86400000);
+
+// App State Cache
+let state = {
+  vaccines: [],
+  batches: [],
+  facilities: [],
+  children: [],
+  ashaTasks: [],
+  transfers: [],
+  log: [],
+  activity: []
+};
+
+let booking = { step:1, vax:'', center:'', date:dateISO(addDays(today, 2)), slot:'', name:'', dob:'', care:'', phone:'', lang:'Marathi' };
+
+// Toast Notification
+function toast(msg) {
+  let t = $('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(window.toastTimer);
+  window.toastTimer = setTimeout(() => t.style.display = 'none', 3600);
+}
+
+// Navigation
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(x => x.classList.add('hidden'));
+  $('page-' + page).classList.remove('hidden');
+  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+
+  const titles = {
+    overview: 'National routine immunization overview',
+    children: 'Children Registry & Digital MCP Passports',
+    asha: 'ASHA & ANM Frontline Worker Field Operations',
+    reminders: 'Automated Reminders & Multi-Channel Alerts',
+    booking: 'Book a Childhood Vaccination',
+    network: 'National Cold-Chain Distribution Network',
+    inventory: 'Stock, VVM Stages & Temperature Alarms'
+  };
+  $('crumb').textContent = titles[page] || 'Overview';
+  $('topTitle').textContent = titles[page] || 'Overview';
+
+  if (page === 'booking') renderBooking();
+  renderAll();
+}
+
+$('nav').addEventListener('click', e => {
+  let b = e.target.closest('button[data-page]');
+  if (b) showPage(b.dataset.page);
+});
+
+function openModal(title, sub, body) {
+  $('modalTitle').textContent = title;
+  $('modalSub').textContent = sub || '';
+  $('modalBody').innerHTML = body;
+  $('modalBackdrop').classList.add('open');
+}
+function closeModal() { $('modalBackdrop').classList.remove('open'); }
+
+// Generate SVG QR Code (Client-side verifiable QR representation)
+function generateSvgQr(text) {
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) hash = ((hash << 5) - hash) + text.charCodeAt(i);
+  let bits = [];
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      if ((r < 3 && c < 3) || (r < 3 && c > 5) || (r > 5 && c < 3)) {
+        bits.push((r === 0 || r === 2 || c === 0 || c === 2 || (r === 1 && c === 1)) ? 1 : 0);
+      } else {
+        bits.push(((hash >> ((r * 9 + c) % 31)) & 1) ? 1 : 0);
+      }
+    }
+  }
+  let rects = '';
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      if (bits[r * 9 + c]) rects += `<rect x="${c * 10 + 5}" y="${r * 10 + 5}" width="9" height="9" fill="#087f8c"/>`;
+    }
+  }
+  return `<svg viewBox="0 0 100 100" class="mcp-qr" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#fff"/>${rects}</svg>`;
+}
+
+// VVM Badge Component
+function vvmBadge(stage) {
+  const labels = {
+    1: 'Stage 1 Â· Usable',
+    2: 'Stage 2 Â· Usable First',
+    3: 'Stage 3 Â· DISCARD (Threshold)',
+    4: 'Stage 4 Â· DISCARD (Heat Damaged)'
+  };
+  const color = (stage <= 2) ? '#16856f' : '#bf4740';
+  return `
+    <div class="vvm-icon" style="color:${color}">
+      <div class="vvm-circle stage-${stage}"><div class="vvm-square"></div></div>
+      <span>${labels[stage] || 'Stage 1'}</span>
+    </div>
+  `;
+}
+
+function ageLabel(dob) {
+  let days = Math.max(0, Math.floor((today - new Date(dob + 'T00:00:00')) / 86400000));
+  if (days < 60) return `${days} days`;
+  let m = Math.floor(days / 30.4375);
+  if (m < 24) return `${m} months`;
+  return `${Math.floor(m / 12)}y ${m % 12}m`;
+}
+
+function statusBadge(s) {
+  let cls = (s === 'Overdue') ? 'overdue' : (s === 'Due soon') ? 'due' : (s === 'Booked') ? 'done' : (s.startsWith('Done')) ? 'done' : 'upcoming';
+  return `<span class="status ${cls}">â— ${s}</span>`;
+}
+
+// -------------------------------------------------------------------------
+// DATA LAYER: Load from REST API or fallback to local
+// -------------------------------------------------------------------------
+async function loadData() {
+  try {
+    const res = await fetch('/api/all');
+    if (res.ok) {
+      state = await res.json();
+      $('serverBadge').innerHTML = '<span style="color:#35c2b1">â— Connected to Node.js Backend</span>';
+      $('livePill').className = 'pill live';
+      $('livePill').textContent = 'â— SERVER LIVE (REST API)';
+    } else {
+      throw new Error('API returned ' + res.status);
+    }
+  } catch (err) {
+    console.warn('[Vaxilink] Backend unavailable, running in local in-memory mode:', err.message);
+    $('serverBadge').innerHTML = '<span style="color:#e5c46b">â— Standalone In-Memory Mode</span>';
+    $('livePill').className = 'pill offline';
+    $('livePill').textContent = 'â— STANDALONE DEMO';
+    initLocalFallback();
+  }
+  renderAll();
+}
+
+function initLocalFallback() {
+  state.vaccines = [
+    { name: 'BCG', short: 'BCG', targetAge: 'At birth', stock: 4200, batches: 4, days: 21 },
+    { name: 'Hepatitis B (Birth dose)', short: 'Hep B', targetAge: 'Within 24h', stock: 1800, batches: 3, days: 18 },
+    { name: 'Oral Polio Vaccine (OPV)', short: 'OPV', targetAge: 'Birth, 6, 10, 14w', stock: 5900, batches: 6, days: 42 },
+    { name: 'Pentavalent', short: 'Penta', targetAge: '6, 10, 14w', stock: 2400, batches: 4, days: 15 },
+    { name: 'Rotavirus Vaccine (RVV)', short: 'Rota', targetAge: '6, 10, 14w', stock: 1200, batches: 2, days: 9 },
+    { name: 'Pneumococcal Conjugate (PCV)', short: 'PCV', targetAge: '6, 14w, booster', stock: 950, batches: 2, days: 7 },
+    { name: 'Measles-Rubella (MR)', short: 'MR', targetAge: '9m & 16-24m', stock: 2100, batches: 3, days: 20 },
+    { name: 'DPT Booster', short: 'DPT booster', targetAge: '16-24m', stock: 670, batches: 2, days: 5 }
+  ];
+  state.facilities = [
+    { name: 'National Hub Â· Pune', type: 'National hub', temp: 4.2, minTemp: 2.0, maxTemp: 8.0, capacity: 76, stock: 9200, excursion: false },
+    { name: 'West Regional Store', type: 'Regional store', temp: 5.1, minTemp: 2.0, maxTemp: 8.0, capacity: 63, stock: 6100, excursion: false },
+    { name: 'Central Regional Store', type: 'Regional store', temp: 7.7, minTemp: 2.0, maxTemp: 8.0, capacity: 81, stock: 4800, excursion: false },
+    { name: 'Shivaji Clinic', type: 'District clinic', temp: 3.8, minTemp: 2.0, maxTemp: 8.0, capacity: 52, stock: 950, excursion: false },
+    { name: 'Pune Central Clinic', type: 'District clinic', temp: 4.6, minTemp: 2.0, maxTemp: 8.0, capacity: 69, stock: 1450, excursion: false },
+    { name: 'Rural Health Centre', type: 'District clinic', temp: 8.4, minTemp: 2.0, maxTemp: 8.0, capacity: 43, stock: 620, excursion: true }
+  ];
+  state.batches = [
+    { batchNo: 'BCG-2409-A', vaccine: 'BCG', facility: 'Pune Central Clinic', doses: 80, expiry: '2027-04-15', vvmStage: 1, quarantined: false },
+    { batchNo: 'BCG-2408-C', vaccine: 'BCG', facility: 'Shivaji Clinic', doses: 24, expiry: '2026-12-20', vvmStage: 2, quarantined: false },
+    { batchNo: 'PENTA-2410-M', vaccine: 'Pentavalent', facility: 'Pune Central Clinic', doses: 30, expiry: '2027-03-25', vvmStage: 1, quarantined: false },
+    { batchNo: 'PENTA-2409-L', vaccine: 'Pentavalent', facility: 'Shivaji Clinic', doses: 12, expiry: '2026-11-20', vvmStage: 2, quarantined: false },
+    { batchNo: 'ROTA-2409-Q', vaccine: 'Rotavirus Vaccine (RVV)', facility: 'Pune Central Clinic', doses: 14, expiry: '2026-12-05', vvmStage: 2, quarantined: false },
+    { batchNo: 'PCV-2409-V', vaccine: 'Pneumococcal Conjugate (PCV)', facility: 'Pune Central Clinic', doses: 18, expiry: '2026-11-15', vvmStage: 2, quarantined: false },
+    { batchNo: 'MR-2409-E', vaccine: 'Measles-Rubella (MR)', facility: 'Pune Central Clinic', doses: 22, expiry: '2027-03-12', vvmStage: 1, quarantined: false }
+  ];
+  state.children = [
+    { id: 'IL-2401', uwinId: 'UWIN-MH-9482-1049', name: 'Aarav Patil', gender: 'Male', dob: '2026-08-05', care: 'Meera Patil', phone: '98â€¢â€¢â€¢ â€¢â€¢214', fullPhone: '9876500214', lang: 'Marathi', center: 'Shivaji Clinic', dose: 'Pentavalent', due: '2026-10-20', status: 'Overdue', ashaWorker: 'Sunita Kadam (Ward 4)', history: [ { vaccine: 'BCG', date: '2026-08-06', batch: 'BCG-2408-C', vvm: 1, facility: 'Shivaji Clinic', vaccinator: 'ANM Rekha T.' } ] },
+    { id: 'IL-2402', uwinId: 'UWIN-MH-8219-3820', name: 'Anaya Sharma', gender: 'Female', dob: '2026-09-12', care: 'Rohit Sharma', phone: '98â€¢â€¢â€¢ â€¢â€¢631', fullPhone: '9876500631', lang: 'Hindi', center: 'Pune Central Clinic', dose: 'Rotavirus Vaccine (RVV)', due: '2026-10-24', status: 'Due soon', ashaWorker: 'Geeta Shinde (Ward 2)', history: [ { vaccine: 'BCG', date: '2026-09-13', batch: 'BCG-2409-A', vvm: 1, facility: 'Pune Central Clinic', vaccinator: 'ANM Kavita P.' } ] }
+  ];
+  state.ashaTasks = [
+    { id: 'TASK-101', childId: 'IL-2401', childName: 'Aarav Patil', ashaWorker: 'Sunita Kadam (Ward 4)', dose: 'Pentavalent', status: 'Action Required', urgency: 'High', reason: 'Overdue by 4 days', lastVisit: '2026-10-18', outcome: 'Caregiver promised visit' },
+    { id: 'TASK-102', childId: 'IL-2404', childName: 'Sara Khan', ashaWorker: 'Laxmi Salve (Rural Sector 1)', dose: 'Measles-Rubella (MR)', status: 'Follow-up Scheduled', urgency: 'Critical', reason: 'Overdue by 12 days', lastVisit: '2026-10-14', outcome: 'Child had fever' }
+  ];
+  state.transfers = [
+    { id: 'TR-071', from: 'West Regional Store', to: 'Shivaji Clinic', vax: 'Pentavalent', doses: 120, progress: 65, status: 'In transit' },
+    { id: 'TR-072', from: 'National Hub Â· Pune', to: 'Pune Central Clinic', vax: 'Oral Polio Vaccine (OPV)', doses: 200, progress: 30, status: 'Loading' }
+  ];
+  state.log = [
+    { time: '11:20 AM', recipient: 'Meera Patil', channel: 'SMS', target: '98â€¢â€¢â€¢ â€¢â€¢214', message: 'Missed-dose follow-up queued in Marathi', status: 'Simulated' }
+  ];
+  state.activity = [
+    { icon: 'ï¼‹', title: 'Booking confirmed', desc: 'Anaya Sharma Â· Rotavirus', time: '2 min ago' }
+  ];
+}
+
+// -------------------------------------------------------------------------
+// RENDERERS
+// -------------------------------------------------------------------------
+function renderAll() {
+  renderExcursionBanner();
+  renderKpis();
+  renderTrend();
+  renderCoverage();
+  renderDuePreview();
+  renderActivity();
+  renderChildren();
+  renderAsha();
+  renderReminders();
+  renderNetwork();
+  renderInventory();
+}
+
+function renderExcursionBanner() {
+  const excFacility = state.facilities.find(f => f.excursion);
+  const banner = $('excursionGlobalAlert');
+  if (excFacility) {
+    banner.classList.remove('hidden');
+    $('excursionText').textContent = `${excFacility.name} recorded ${excFacility.temp.toFixed(1)}Â°C (Outside +2Â°C to +8Â°C). Associated vaccine batches have been flagged for quarantine.`;
+  } else {
+    banner.classList.add('hidden');
+  }
+}
+
+function renderKpis() {
+  const due = state.children.filter(k => dayDiff(k.due) <= 0 && !k.status.startsWith('Done')).length;
+  const excCount = state.facilities.filter(f => f.excursion).length;
+  const data = [
+    ['Doses Administered (Today)', '286', 'â†‘ 8% vs yesterday', 'â†—'],
+    ['Cohort Coverage (Under 5)', '78.4%', 'Universal Immunization Est.', 'â—‰'],
+    ['Due / Overdue Infants', String(due), `${state.children.length} enrolled beneficiaries`, 'â—·'],
+    ['Cold-Chain Excursions', String(excCount), excCount > 0 ? 'Requires immediate action' : 'All stores normal', 'âš ']
+  ];
+  $('kpis').innerHTML = data.map(d => `
+    <div class="card">
+      <div class="kpi-top"><span>${d[0]}</span><span class="kpi-icon">${d[3]}</span></div>
+      <div class="kpi-value">${d[1]}</div>
+      <div class="kpi-note">${d[2]}</div>
+    </div>
+  `).join('');
+}
+
+function renderTrend() {
+  let s = [14, 18, 16, 23, 20, 26, 28, 25, 33, 30, 36, 32, 40, 44];
+  let c = [4, 5, 3, 7, 6, 8, 5, 9, 8, 10, 8, 11, 10, 14];
+  let svg = $('trendChart'), W = 640, H = 220, L = 32, R = 12, T = 16, B = 30, iw = W - L - R, ih = H - T - B, max = 60;
+  let y = v => T + ih - v / max * ih, x = i => L + i * iw / 13;
+  let grid = [0, 15, 30, 45, 60].map(v => `<line x1="${L}" y1="${y(v)}" x2="${W-R}" y2="${y(v)}" stroke="#e8eff0"/><text x="${L-7}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="#82939a">${v}</text>`).join('');
+  let line = (a, col) => `<polyline fill="none" stroke="${col}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${a.map((v,i)=>x(i)+','+y(v)).join(' ')}"/>`;
+  let dots = (a, col) => a.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="3.5" fill="${col}"/>`).join('');
+  let labels = s.map((_, i) => i % 2 === 0 ? `<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="10" fill="#82939a">${i===0?'Oct 10':i===12?'Oct 22':'-'+(13-i)+'d'}</text>` : '').join('');
+  svg.innerHTML = grid + line(s, '#087f8c') + line(c, '#7ea2e6') + dots(s, '#087f8c') + dots(c, '#7ea2e6') + labels;
+}
+
+function renderCoverage() {
+  const data = [
+    ['BCG (At birth)', 94],
+    ['Hep B (Birth dose)', 88],
+    ['OPV (Birth & primary)', 83],
+    ['Pentavalent (Primary)', 78],
+    ['Rotavirus (RVV)', 76],
+    ['PCV (Pneumococcal)', 72],
+    ['Measles-Rubella (MR)', 69],
+    ['DPT Booster', 61]
+  ];
+  $('coverageBars').innerHTML = data.map(([n, v]) => `
+    <div class="coverage-row">
+      <span>${n}</span>
+      <div class="progress"><span style="width:${v}%"></span></div>
+      <strong>${v}%</strong>
+    </div>
+  `).join('');
+}
+
+function renderDuePreview() {
+  const dueKids = state.children.filter(k => k.status === 'Overdue' || k.status === 'Due soon').slice(0, 5);
+  $('duePreview').innerHTML = dueKids.map(k => `
+    <tr>
+      <td><strong>${k.name}</strong><br><span class="small-muted">${k.uwinId || k.id}</span></td>
+      <td>${k.dose}</td>
+      <td>${fmtDate(k.due)}</td>
+      <td>${statusBadge(k.status)}</td>
+      <td><button class="secondary small" onclick="openMcpCard('${k.id}')">MCP Card</button></td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" class="empty">No infants currently due.</td></tr>';
+}
+
+function renderActivity() {
+  $('activityFeed').innerHTML = (state.activity || []).slice(0, 5).map(a => `
+    <div class="feed-item">
+      <div class="feed-icon">${a.icon}</div>
+      <div><strong>${a.title}</strong><small>${a.desc}<br>${a.time}</small></div>
+    </div>
+  `).join('');
+}
+
+// -------------------------------------------------------------------------
+// FEATURE 1: CHILDREN REGISTRY & DIGITAL MCP PASSPORT
+// -------------------------------------------------------------------------
+function renderChildren() {
+  const q = ($('childSearch')?.value || '').toLowerCase();
+  const st = $('statusFilter')?.value || 'all';
+  const list = state.children.filter(k => {
+    const text = [k.name, k.care, k.id, k.uwinId, k.fullPhone || k.phone].join(' ').toLowerCase();
+    const matchesQ = text.includes(q);
+    const matchesSt = (st === 'all' || k.status === st);
+    return matchesQ && matchesSt;
+  });
+
+  $('childrenTable').innerHTML = list.map(k => `
+    <tr>
+      <td>
+        <strong>${k.name}</strong> (${k.gender || 'Infant'})<br>
+        <span class="small-muted">${k.uwinId || k.id}</span>
+      </td>
+      <td>${k.care}<br><span class="small-muted">${k.phone}</span></td>
+      <td>${ageLabel(k.dob)}</td>
+      <td><strong>${k.dose}</strong></td>
+      <td>${fmtDate(k.due)}</td>
+      <td>${statusBadge(k.status)}</td>
+      <td>
+        <button class="small" onclick="openMcpCard('${k.id}')" style="background:#087f8c;color:#fff">
+          ðŸ“‡ Digital MCP Card
+        </button>
+      </td>
+      <td>
+        <button class="secondary small" onclick="contactChild('${k.id}', 'SMS')">SMS</button>
+        <button class="secondary small" onclick="openMcpCard('${k.id}')">Details</button>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="8" class="empty">No matching children found.</td></tr>';
+}
+
+// Open Digital Immunization Card (U-WIN / Co-WIN Style)
+function openMcpCard(id) {
+  const child = state.children.find(c => c.id === id);
+  if (!child) return;
+
+  const historyRows = (child.history && child.history.length > 0)
+    ? child.history.map((h, i) => `
+        <tr>
+          <td><strong>${h.vaccine}</strong></td>
+          <td>${fmtDate(h.date)}</td>
+          <td><code>${h.batch || 'BATCH-AUTO'}</code></td>
+          <td>${vvmBadge(h.vvm || 1)}</td>
+          <td>${h.facility || child.center}</td>
+          <td>${h.vaccinator || 'ANM On Duty'}</td>
+        </tr>
+      `).join('')
+    : '<tr><td colspan="6" class="empty">No past doses recorded yet in registry.</td></tr>';
+
+  const mcpBody = `
+    <div class="mcp-passport">
+      <div class="mcp-header">
+        <div class="mcp-emblem">
+          <div style="font-size:32px">ðŸ‡®ðŸ‡³</div>
+          <div>
+            <div style="font-size:11px;font-weight:800;color:#087f8c;text-transform:uppercase;letter-spacing:1px">Universal Immunization Programme Â· Government of India</div>
+            <div style="font-size:18px;font-weight:900;letter-spacing:-.5px">Digital Mother & Child Protection (MCP) Passport</div>
+            <div style="font-size:11px;color:var(--muted)">Ministry of Health & Family Welfare Â· U-WIN Digital Health Record</div>
+          </div>
+        </div>
+        <div>
+          ${generateSvgQr(`VAXILINK-VERIFY:${child.uwinId || child.id}:${child.dob}:${child.history ? child.history.length : 0}-DOSES`)}
+        </div>
+      </div>
+
+      <div class="mcp-grid">
+        <div class="mcp-field"><span>Child Full Name</span><strong>${child.name}</strong></div>
+        <div class="mcp-field"><span>Beneficiary U-WIN ID</span><strong style="color:#087f8c">${child.uwinId || child.id}</strong></div>
+        <div class="mcp-field"><span>Gender / Date of Birth</span><strong>${child.gender || 'Child'} Â· ${fmtDate(child.dob)} (${ageLabel(child.dob)})</strong></div>
+        <div class="mcp-field"><span>Mother / Caregiver</span><strong>${child.care}</strong></div>
+        <div class="mcp-field"><span>Contact Number</span><strong>${child.phone}</strong></div>
+        <div class="mcp-field"><span>Registered PHC Centre</span><strong>${child.center}</strong></div>
+        <div class="mcp-field"><span>Preferred Language</span><strong>${child.lang}</strong></div>
+        <div class="mcp-field"><span>Assigned ASHA Worker</span><strong>${child.ashaWorker || 'Sunita Kadam (Ward 4)'}</strong></div>
+        <div class="mcp-field"><span>Immunization Status</span><strong>${child.status}</strong></div>
+      </div>
+
+      <div style="margin:16px 0 8px">
+        <strong style="font-size:13px">Verified Doses Administered:</strong>
+      </div>
+      <div class="table-wrap" style="background:#fff;border:1px solid var(--line);border-radius:10px">
+        <table>
+          <thead>
+            <tr><th>Vaccine</th><th>Date Given</th><th>Batch Number</th><th>VVM Status</th><th>Health Centre</th><th>Vaccinator</th></tr>
+          </thead>
+          <tbody>${historyRows}</tbody>
+        </table>
+      </div>
+
+      <div style="margin:18px 0;background:#f0faf9;border:1px solid #c2ece7;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <span style="font-size:11px;color:var(--muted);text-transform:uppercase">Next Recommended Milestone</span><br>
+          <strong style="font-size:14px;color:#087f8c">${child.dose} Â· Due on ${fmtDate(child.due)}</strong>
+        </div>
+        <div class="mcp-seal">âœ“ OFFICIALLY RECORDED IN UIP REGISTRY</div>
+      </div>
+
+      <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
+        <a href="/api/fhir/ImmunizationRecord/${child.id}" target="_blank" style="font-size:12px;color:#087f8c;text-decoration:none;font-weight:700">
+          ðŸ”— Download HL7 FHIR R4 Bundle (JSON)
+        </a>
+        <div style="display:flex;gap:10px">
+          <button class="secondary" onclick="window.print()">ðŸ–¨ï¸ Print / Save as PDF</button>
+          <button onclick="closeModal();startBookingFor('${child.id}')">Book Next Dose</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  openModal(`Child Immunization Card Â· ${child.name}`, `${child.uwinId || child.id} Â· Official Digital Record`, mcpBody);
+}
+
+// -------------------------------------------------------------------------
+// FEATURE 2: ASHA / ANM FRONTLINE WORKER PORTAL
+// -------------------------------------------------------------------------
+function renderAsha() {
+  const tasks = state.ashaTasks || [];
+  $('ashaCount').textContent = tasks.filter(t => t.status !== 'Vaccinated at Session').length;
+
+  const kpis = [
+    ['Total Catchment Infants', String(state.children.length), 'Assigned frontline cohort', 'ðŸ‘¥'],
+    ['High-Risk Dropouts', String(tasks.filter(t => t.urgency === 'Critical' || t.urgency === 'High').length), 'Requires door-to-door follow-up', 'âš '],
+    ['Home Visits Pending', String(tasks.filter(t => t.status === 'Action Required').length), 'Scheduled this week', 'â—·'],
+    ['Vaccinated at Sessions', String(tasks.filter(t => t.status.includes('Vaccinated')).length), 'Protected on VHSND days', 'âœ“']
+  ];
+  $('ashaKpis').innerHTML = kpis.map(d => `
+    <div class="card">
+      <div class="kpi-top"><span>${d[0]}</span><span class="kpi-icon">${d[3]}</span></div>
+      <div class="kpi-value">${d[1]}</div>
+      <div class="kpi-note">${d[2]}</div>
+    </div>
+  `).join('');
+
+  $('ashaTaskTable').innerHTML = tasks.map(t => `
+    <tr>
+      <td>
+        <strong>${t.childName}</strong><br>
+        <span class="small-muted">${t.ashaWorker}</span>
+      </td>
+      <td><strong>${t.dose}</strong></td>
+      <td>
+        <span class="status ${t.urgency==='Critical'?'overdue':t.urgency==='High'?'due':'upcoming'}">
+          ${t.urgency}
+        </span>
+      </td>
+      <td>
+        <strong>${t.reason}</strong><br>
+        <span class="small-muted">Outcome: ${t.outcome || 'Pending'}</span>
+      </td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="secondary small" onclick="openHomeVisitModal('${t.id}')">Log Visit</button>
+          <button class="small" onclick="openSessionAdminModal('${t.childId}')">Administer</button>
+        </div>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" class="empty">No active field tasks assigned.</td></tr>';
+}
+
+function openHomeVisitModal(taskId) {
+  const task = (state.ashaTasks || []).find(t => t.id === taskId);
+  if (!task) return;
+
+  const body = `
+    <div class="form-grid">
+      <div class="full notice">
+        Recording field counseling for <strong>${task.childName}</strong> (Missed dose: ${task.dose}). Assigned to: ${task.ashaWorker}.
+      </div>
+      <div class="field full">
+        <label>Home Visit Outcome / Caregiver Response</label>
+        <select id="visitOutcome">
+          <option>Caregiver counseled â€” Promised to attend next VHSND session</option>
+          <option>Child temporary illness (fever/cough) â€” Rescheduled</option>
+          <option>Family seasonal migration / temporarily out of village</option>
+          <option>Vaccine hesitancy / AEFI fear addressed through counseling</option>
+          <option>Distance/Transport issue â€” Mobile team visit requested</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Next Follow-Up Commitment Date</label>
+        <input type="date" id="visitNextDate" min="${dateISO(today)}" value="${dateISO(addDays(today, 3))}">
+      </div>
+      <div class="field">
+        <label>Counseling Notes</label>
+        <input id="visitNotes" placeholder="E.g. Spoke with grandmother; agreed to Thursday session">
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px">
+      <button class="secondary" onclick="closeModal()">Cancel</button>
+      <button onclick="submitHomeVisit('${taskId}')">Save Field Visit Record</button>
+    </div>
+  `;
+  openModal(`Record ASHA Home Visit Â· ${task.childName}`, `Task ID: ${taskId}`, body);
+}
+
+async function submitHomeVisit(taskId) {
+  const outcome = $('visitOutcome').value;
+  const nextDate = $('visitNextDate').value;
+  const notes = $('visitNotes').value;
+
+  try {
+    const res = await fetch('/api/asha/visit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ taskId, outcome, nextActionDate: nextDate, notes })
+    });
+    if (res.ok) {
+      toast('Home visit outcome saved to central registry!');
+    }
+  } catch (e) {
+    // Local fallback update
+    const t = state.ashaTasks.find(x => x.id === taskId);
+    if (t) {
+      t.outcome = outcome;
+      t.nextActionDate = nextDate;
+      t.status = 'Completed / Follow-up Set';
+    }
+    toast('Home visit recorded in local session!');
+  }
+  closeModal();
+  loadData();
+}
+
+// Session Site Administer Dose
+function openSessionAdminModal(childId) {
+  const child = state.children.find(c => c.id === childId);
+  if (!child) return;
+
+  const usableBatches = state.batches.filter(b => !b.quarantined && b.vvmStage <= 2);
+
+  const body = `
+    <div class="form-grid">
+      <div class="full notice">
+        Administering routine dose at Session Site for <strong>${child.name}</strong> (${ageLabel(child.dob)}).
+      </div>
+      <div class="field">
+        <label>Vaccine to Administer</label>
+        <input id="admVaccine" value="${child.dose}" readonly>
+      </div>
+      <div class="field">
+        <label>Allocated FEFO Batch Lot</label>
+        <select id="admBatch">
+          ${usableBatches.map(b => `<option value="${b.batchNo}">${b.batchNo} (${b.vaccine} Â· Exp: ${b.expiry} Â· ${vvmBadge(b.vvmStage)})</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>VVM Stage Verification at Injection</label>
+        <select id="admVvm">
+          <option value="1">Stage 1: Inner square white (Usable)</option>
+          <option value="2">Stage 2: Inner square light purple (Usable)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Administering Vaccinator (ANM)</label>
+        <input id="admVaccinator" value="ANM Rekha Tambe">
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px">
+      <button class="secondary" onclick="closeModal()">Cancel</button>
+      <button onclick="submitAdministerDose('${childId}')">Verify & Record Dose</button>
+    </div>
+  `;
+  openModal(`Session Site Dose Administration Â· ${child.name}`, `Beneficiary: ${child.uwinId || child.id}`, body);
+}
+
+async function submitAdministerDose(childId) {
+  const vaccine = $('admVaccine').value;
+  const batchNo = $('admBatch').value;
+  const vvmStage = $('admVvm').value;
+  const vaccinator = $('admVaccinator').value;
+
+  try {
+    const res = await fetch('/api/asha/administer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ childId, vaccine, batchNo, vaccinator, vvmStage })
+    });
+    if (res.ok) {
+      toast('Dose recorded successfully! Digital MCP Certificate updated.');
+    }
+  } catch (e) {
+    const child = state.children.find(c => c.id === childId);
+    if (child) {
+      child.history.push({ vaccine, date: dateISO(today), batch: batchNo, vvm: Number(vvmStage), facility: child.center, vaccinator });
+      child.status = 'Done (Up to date)';
+      child.dose = 'Next Milestone';
+    }
+    toast('Dose recorded locally! Digital MCP Card updated.');
+  }
+  closeModal();
+  loadData();
+}
+
+// -------------------------------------------------------------------------
+// FEATURE 3: VVM & COLD-CHAIN BATCH MANAGEMENT WITH EXCURSION SIMULATOR
+// -------------------------------------------------------------------------
+function renderInventory() {
+  const low = state.batches.filter(b => b.doses < 15).length;
+  const exc = state.facilities.filter(f => f.excursion).length;
+  const quar = state.batches.filter(b => b.quarantined).length;
+
+  $('inventoryKpis').innerHTML = [
+    ['Monitored Batches', String(state.batches.length), 'FEFO stock tracking', 'â–¤'],
+    ['Cold-Chain Excursions', String(exc), exc > 0 ? 'Out of safe 2Â°-8Â°C' : 'All facilities safe', 'âš '],
+    ['Quarantined Batches', String(quar), 'Heat damage or excursion flag', 'âš‘'],
+    ['Storage Facilities', String(state.facilities.length), 'National hub to PHC clinics', 'âŒ˜']
+  ].map(d => `
+    <div class="card">
+      <div class="kpi-top"><span>${d[0]}</span><span class="kpi-icon">${d[3]}</span></div>
+      <div class="kpi-value">${d[1]}</div>
+      <div class="kpi-note">${d[2]}</div>
+    </div>
+  `).join('');
+
+  // Facility Cold Storage Cards
+  $('coldTable').innerHTML = state.facilities.map(f => `
+    <div class="facility ${f.excursion ? 'excursion-active' : ''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <strong>${f.name}</strong>
+          <small>${f.type} Â· Cap: ${f.capacity}%</small>
+        </div>
+        ${f.excursion ? '<span class="status overdue">EXCURSION</span>' : '<span class="status done">NORMAL</span>'}
+      </div>
+      <div class="temp" style="color:${f.temp < 2 || f.temp > 8 ? '#bf4740' : f.temp > 7.4 ? '#b77a17' : '#16856f'}">
+        ${f.temp.toFixed(1)}Â°C
+      </div>
+      <small style="color:var(--muted)">Safe: ${f.minTemp.toFixed(1)}Â°C to ${f.maxTemp.toFixed(1)}Â°C</small>
+      <div style="display:flex;gap:6px;margin-top:10px">
+        <button class="secondary small" onclick="simulateTemp('${f.name}', ${f.excursion ? 4.5 : 10.4})">
+          ${f.excursion ? 'âœ“ Normalize (4.5Â°C)' : 'âš¡ Spike Excursion (+10.4Â°C)'}
+        </button>
+        <button class="secondary small" onclick="simulateTemp('${f.name}', -1.2)">
+          â„ Freeze (-1.2Â°C)
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  // Batch Table (FEFO sorted)
+  const sortedBatches = [...state.batches].sort((a, b) => new Date(a.expiry) - new Date(b.expiry));
+  $('batchTable').innerHTML = sortedBatches.map(b => `
+    <tr>
+      <td><strong><code>${b.batchNo}</code></strong></td>
+      <td>${b.vaccine}</td>
+      <td>${b.facility}</td>
+      <td><strong>${b.doses}</strong> doses</td>
+      <td>${fmtDate(b.expiry)}</td>
+      <td>${vvmBadge(b.vvmStage)}</td>
+      <td>
+        ${b.quarantined
+          ? '<span class="status quarantine">âš  QUARANTINED</span>'
+          : '<span class="status done">AVAILABLE (FEFO)</span>'
+        }
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="7" class="empty">No batches registered.</td></tr>';
+}
+
+async function simulateTemp(facilityName, temp) {
+  try {
+    const res = await fetch('/api/facilities/temp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ facilityName, newTemp: temp })
+    });
+    if (res.ok) {
+      toast(`Temperature sensor updated: ${facilityName} is now ${temp}Â°C`);
+    }
+  } catch (e) {
+    const fac = state.facilities.find(f => f.name === facilityName);
+    if (fac) {
+      fac.temp = temp;
+      fac.excursion = (temp < 2.0 || temp > 8.0);
+      state.batches.forEach(b => {
+        if (b.facility === fac.name) b.quarantined = fac.excursion;
+      });
+    }
+    toast(`Local temp updated: ${facilityName} at ${temp}Â°C`);
+  }
+  loadData();
+}
+
+function openRestock() {
+  const body = `
+    <div class="form-grid">
+      <div class="field">
+        <label>Vaccine</label>
+        <select id="rVax">
+          ${state.vaccines.map(v => `<option>${v.name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Receiving Facility</label>
+        <select id="rFac">
+          ${state.facilities.map(f => `<option>${f.name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Number of Doses</label>
+        <input id="rDoses" type="number" min="10" value="200">
+      </div>
+      <div class="field">
+        <label>Batch Lot Expiry Date (FEFO)</label>
+        <input id="rExpiry" type="date" min="${dateISO(today)}" value="${dateISO(addDays(today, 180))}">
+      </div>
+      <div class="full notice">
+        New batches arrive with initial Vaccine Vial Monitor (VVM) Stage 1 verification.
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:16px">
+      <button onclick="submitRestock()">Record Restock Batch</button>
+    </div>
+  `;
+  openModal('Record Vaccine Batch Restock', 'FEFO Inventory Entry', body);
+}
+
+async function submitRestock() {
+  const vaccine = $('rVax').value;
+  const facility = $('rFac').value;
+  const doses = $('rDoses').value;
+  const expiry = $('rExpiry').value;
+
+  try {
+    const res = await fetch('/api/batches/restock', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ vaccine, facility, doses, expiry })
+    });
+    if (res.ok) toast('New batch registered with FEFO priority!');
+  } catch (e) {
+    state.batches.push({
+      batchNo: `${vaccine.substring(0,4).toUpperCase()}-2412-AUTO`,
+      vaccine, facility, doses: Number(doses), expiry, vvmStage: 1, quarantined: false
+    });
+    toast('Batch recorded in local session!');
+  }
+  closeModal();
+  loadData();
+}
+
+// -------------------------------------------------------------------------
+// FEATURE 4: 5-STEP VACCINATION BOOKING FLOW WITH FEFO ALLOCATION
+// -------------------------------------------------------------------------
+function openBooking() {
+  booking = { step: 1, vax: '', center: '', date: dateISO(addDays(today, 2)), slot: '', name: '', dob: '', care: '', phone: '', lang: 'Marathi' };
+  showPage('booking');
+  renderBooking();
+}
+
+function startBookingFor(childId) {
+  const child = state.children.find(c => c.id === childId);
+  booking = {
+    step: 4,
+    vax: child.dose,
+    center: child.center,
+    date: dateISO(addDays(today, Math.max(1, dayDiff(child.due)))),
+    slot: '10:00 AM',
+    name: child.name,
+    dob: child.dob,
+    care: child.care,
+    phone: child.fullPhone || child.phone,
+    lang: child.lang,
+    childId: child.id
+  };
+  showPage('booking');
+  renderBooking();
+}
+
+function suggestedDose(dob) {
+  if (!dob) return state.vaccines[0]?.name || 'BCG';
+  let days = Math.floor((today - new Date(dob + 'T00:00:00')) / 86400000);
+  if (days <= 1) return 'BCG';
+  if (days < 14) return 'Oral Polio Vaccine (OPV)';
+  if (days < 70) return 'Pentavalent';
+  if (days < 120) return 'Rotavirus Vaccine (RVV)';
+  if (days < 270) return 'Pneumococcal Conjugate (PCV)';
+  if (days < 450) return 'Measles-Rubella (MR)';
+  return 'DPT Booster';
+}
+
+function renderBooking() {
+  for (let i = 1; i <= 5; i++) $('st' + i).classList.toggle('active', i <= booking.step);
+  let root = $('bookingStep');
+
+  if (booking.step === 1) {
+    root.innerHTML = `
+      <div class="card-title">Step 1 of 5 Â· Select Vaccine Antigen</div>
+      <p class="card-sub">Choose a vaccine from the Universal Immunization Programme routine catalog</p>
+      <div class="vaccine-options section">
+        ${state.vaccines.map(v => `
+          <button class="vax-option ${booking.vax===v.name?'selected':''}" onclick="booking.vax='${v.name}';renderBooking()">
+            <strong>${v.name}</strong>
+            <small>${v.targetAge} Â· ${v.stock ? v.stock.toLocaleString('en-IN') : 'Available'} doses</small>
+          </button>
+        `).join('')}
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:20px">
+        <button onclick="nextBooking()" ${booking.vax?'':'disabled'}>Choose Healthcare Centre â†’</button>
+      </div>
+    `;
+  }
+
+  if (booking.step === 2) {
+    const centers = ['Pune Central Clinic', 'Shivaji Clinic', 'Rural Health Centre'];
+    root.innerHTML = `
+      <div class="card-title">Step 2 of 5 Â· Select Healthcare Centre</div>
+      <p class="card-sub">Stock is allocated from safe +2Â°C to +8Â°C cold-chain batches</p>
+      <div class="vaccine-options section">
+        ${centers.map(c => {
+          const fac = state.facilities.find(f => f.name === c);
+          const isExc = fac && fac.excursion;
+          return `
+            <button class="vax-option ${booking.center===c?'selected':''}" ${isExc?'disabled':''} onclick="booking.center='${c}';renderBooking()">
+              <strong>${c} ${isExc ? 'Â· QUARANTINED (Temp Excursion)' : ''}</strong>
+              <small>${fac ? fac.temp.toFixed(1) + 'Â°C' : '+4.0Â°C'} Â· ${isExc ? 'Appointments disabled' : 'Cold chain verified'}</small>
+            </button>
+          `;
+        }).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:20px">
+        <button class="secondary" onclick="booking.step=1;renderBooking()">â† Back</button>
+        <button onclick="nextBooking()" ${booking.center?'':'disabled'}>Choose Date & Slot â†’</button>
+      </div>
+    `;
+  }
+
+  if (booking.step === 3) {
+    const slots = ['09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM', '02:00 PM', '02:30 PM'];
+    root.innerHTML = `
+      <div class="card-title">Step 3 of 5 Â· Appointment Slot</div>
+      <p class="card-sub">${booking.center} Â· ${booking.vax}</p>
+      <div class="field section" style="max-width:260px">
+        <label>Select Date</label>
+        <input type="date" id="bookDate" min="${dateISO(addDays(today, 1))}" value="${booking.date}" onchange="booking.date=this.value;renderBooking()">
+      </div>
+      <div class="slots section">
+        ${slots.map(s => `
+          <button class="slot ${booking.slot===s?'selected':''}" onclick="booking.slot='${s}';renderBooking()">
+            ${s}
+          </button>
+        `).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:20px">
+        <button class="secondary" onclick="booking.step=2;renderBooking()">â† Back</button>
+        <button onclick="nextBooking()" ${booking.slot?'':'disabled'}>Beneficiary Details â†’</button>
+      </div>
+    `;
+  }
+
+  if (booking.step === 4) {
+    root.innerHTML = `
+      <div class="card-title">Step 4 of 5 Â· Child & Guardian Information</div>
+      <p class="card-sub">Birth date automatically suggests appropriate schedule milestones</p>
+      <div class="form-grid section">
+        <div class="field">
+          <label>Child's Full Name</label>
+          <input id="bName" value="${booking.name}" placeholder="Infant name">
+        </div>
+        <div class="field">
+          <label>Date of Birth</label>
+          <input id="bDob" type="date" max="${dateISO(today)}" value="${booking.dob}" onchange="suggestDoseUI()">
+        </div>
+        <div class="field">
+          <label>Mother / Guardian Name</label>
+          <input id="bCare" value="${booking.care}" placeholder="Caregiver name">
+        </div>
+        <div class="field">
+          <label>10-Digit Mobile Number</label>
+          <input id="bPhone" value="${booking.phone}" maxlength="10" inputmode="numeric" placeholder="9876543210">
+        </div>
+        <div class="field">
+          <label>Preferred Communication Language</label>
+          <select id="bLang">
+            ${['Marathi', 'Hindi', 'English', 'Bengali', 'Tamil', 'Telugu'].map(l => `<option ${booking.lang===l?'selected':''}>${l}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>DOB Schedule Recommendation</label>
+          <input id="doseSuggest" readonly value="${booking.dob ? suggestedDose(booking.dob) : 'Enter DOB to calculate'}">
+        </div>
+        <div class="full notice">
+          U-WIN Beneficiary ID and verifiable digital immunization record will be generated automatically upon booking confirmation.
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:20px">
+        <button class="secondary" onclick="booking.step=3;renderBooking()">â† Back</button>
+        <button onclick="nextBooking()">Confirm Appointment â†’</button>
+      </div>
+    `;
+  }
+
+  if (booking.step === 5) {
+    root.innerHTML = `
+      <div style="text-align:center;padding:20px">
+        <div style="font-size:52px;color:#087f8c">âœ“</div>
+        <div class="h1" style="font-size:26px">Appointment Confirmed</div>
+        <p class="sub" style="margin:0 auto">Beneficiary enrolled in Universal Immunization Programme registry. Digital MCP Card is ready.</p>
+        <div class="card section" style="max-width:500px;margin:20px auto;text-align:left">
+          <div class="small-muted">OFFICIAL U-WIN ID</div>
+          <div class="kpi-value" style="font-size:24px;color:#087f8c">${booking.uwinId || 'UWIN-MH-2026-9912'}</div>
+          <p>
+            <strong>${booking.name}</strong><br>
+            Vaccine: <strong>${booking.vax}</strong><br>
+            Center: ${booking.center}<br>
+            Date: ${fmtDate(booking.date)} at ${booking.slot}<br>
+            Guardian: ${booking.care} (${booking.phone})
+          </p>
+        </div>
+        <div style="display:flex;justify-content:center;gap:12px">
+          <button onclick="openMcpCard('${booking.childId || 'IL-2401'}')">ðŸ“‡ View Digital MCP Card</button>
+          <button class="secondary" onclick="showPage('children')">View Children Registry</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function suggestDoseUI() {
+  const d = $('bDob').value;
+  $('doseSuggest').value = d ? suggestedDose(d) : 'Enter DOB to calculate';
+}
+
+async function nextBooking() {
+  if (booking.step === 1 && !booking.vax) return;
+  if (booking.step === 2 && !booking.center) return;
+  if (booking.step === 3 && !booking.slot) return;
+  if (booking.step === 4) {
+    booking.name = $('bName').value.trim();
+    booking.dob = $('bDob').value;
+    booking.care = $('bCare').value.trim();
+    booking.phone = $('bPhone').value.trim();
+    booking.lang = $('bLang').value;
+
+    if (!booking.name || !booking.dob || !booking.care || !/^\d{10}$/.test(booking.phone)) {
+      toast('Please enter child name, DOB, guardian, and a valid 10-digit mobile number.');
+      return;
+    }
+    if (!booking.vax) booking.vax = suggestedDose(booking.dob);
+
+    const uwin = 'UWIN-MH-' + Math.floor(1000 + Math.random() * 9000) + '-' + Math.floor(1000 + Math.random() * 9000);
+    booking.uwinId = uwin;
+
+    const newChild = {
+      id: booking.childId || ('IL-' + (2400 + state.children.length + 1)),
+      uwinId: uwin,
+      name: booking.name,
+      dob: booking.dob,
+      gender: 'Infant',
+      care: booking.care,
+      phone: booking.phone.replace(/^(\d{2})\d{4}(\d{4})$/, '$1â€¢â€¢â€¢ â€¢â€¢$2'),
+      fullPhone: booking.phone,
+      lang: booking.lang,
+      center: booking.center,
+      dose: booking.vax,
+      due: booking.date,
+      status: 'Booked',
+      ashaWorker: 'Sunita Kadam (Ward 4)',
+      history: []
+    };
+
+    try {
+      await fetch('/api/children', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newChild)
+      });
+    } catch (e) {
+      state.children.unshift(newChild);
+    }
+    booking.childId = newChild.id;
+    booking.step = 5;
+    renderBooking();
+    loadData();
+    toast('Beneficiary recorded and appointment confirmed!');
+    return;
+  }
+
+  if (booking.step < 4) {
+    booking.step++;
+    renderBooking();
+  }
+}
+
+// -------------------------------------------------------------------------
+// REMINDERS & TELEPHONY SIMULATION
+// -------------------------------------------------------------------------
+function renderReminders() {
+  $('contactQueue').innerHTML = state.children.map(k => `
+    <div class="rule">
+      <div>
+        <strong>${k.name} Â· ${k.dose}</strong>
+        <small>${k.care} Â· ${k.phone} Â· ${statusBadge(k.status)}</small>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="secondary small" onclick="contactChild('${k.id}', 'Call')">Call</button>
+        <button class="small" onclick="contactChild('${k.id}', 'SMS')">SMS</button>
+      </div>
+    </div>
+  `).join('');
+
+  $('commLog').innerHTML = (state.log || []).slice(0, 10).map(x => `
+    <tr>
+      <td>${x.time}</td>
+      <td><strong>${x.child || x.recipient}</strong></td>
+      <td><span class="pill">${x.channel}</span></td>
+      <td>${x.target || x.recipient}</td>
+      <td>${x.message}</td>
+      <td>${statusBadge(x.status || 'Done')}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="6" class="empty">No alerts sent yet.</td></tr>';
+}
+
+function contactChild(id, channel) {
+  const child = state.children.find(c => c.id === id);
+  if (!child) return;
+
+  const msg = channel === 'Call'
+    ? `Automated IVR caregiver confirmation call initiated in ${child.lang}`
+    : `Routine immunization reminder dispatched in ${child.lang} for ${child.dose}`;
+
+  state.log.unshift({
+    time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+    child: child.name,
+    recipient: child.care,
+    target: child.phone,
+    channel,
+    message: msg,
+    status: 'Delivered'
+  });
+  renderReminders();
+  toast(`${channel} sent to ${child.care} (${child.phone})`);
+}
+
+function runDueAlerts() {
+  let count = 0;
+  state.children.forEach(k => {
+    let diff = dayDiff(k.due);
+    if (diff <= 3 && !k.status.startsWith('Done')) {
+      state.log.unshift({
+        time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+        child: k.name,
+        recipient: k.care,
+        target: k.phone,
+        channel: 'Automated Alert',
+        message: `Due alert: ${k.dose} scheduled for ${fmtDate(k.due)}`,
+        status: 'Delivered'
+      });
+      count++;
+    }
+  });
+  renderReminders();
+  toast(`${count} automated caregiver reminders queued and delivered.`);
+}
+
+function saveRules() { toast('Reminder configuration saved to server.'); }
+function clearLog() { state.log = []; renderReminders(); toast('Log cleared.'); }
+
+// -------------------------------------------------------------------------
+// PROVIDER NETWORK & SHIPMENT TRACKING
+// -------------------------------------------------------------------------
+function renderNetwork() {
+  const active = state.transfers.filter(t => t.status !== 'Delivered').length;
+  $('networkKpis').innerHTML = [
+    ['Active Consignments', String(active), 'Simulated GPS tracking', 'â†—'],
+    ['Facilities Monitored', String(state.facilities.length), 'Hub, regional & district', 'âŒ˜'],
+    ['Cold-Chain Alarms', String(state.facilities.filter(f => f.excursion).length), 'Temperature out of bound', 'âš '],
+    ['Network Stock', '22,400', 'Total catalog doses', 'â–¤']
+  ].map(d => `
+    <div class="card">
+      <div class="kpi-top"><span>${d[0]}</span><span class="kpi-icon">${d[3]}</span></div>
+      <div class="kpi-value">${d[1]}</div>
+      <div class="kpi-note">${d[2]}</div>
+    </div>
+  `).join('');
+
+  $('transferTable').innerHTML = state.transfers.map(t => `
+    <tr>
+      <td><strong>${t.id}</strong></td>
+      <td>${t.from}<br><span class="small-muted">â†’ ${t.to}</span></td>
+      <td>${t.vax}</td>
+      <td>${t.doses}</td>
+      <td style="min-width:130px">
+        <div class="progress"><span style="width:${t.progress}%"></span></div>
+        <small>${t.progress}%</small>
+      </td>
+      <td><span class="status ${t.status==='Delivered'?'done':'due'}">${t.status}</span></td>
+    </tr>
+  `).join('');
+}
+
+async function advanceTransfers() {
+  try {
+    await fetch('/api/transfers/advance', { method: 'POST' });
+  } catch (e) {
+    state.transfers.forEach(t => {
+      if (t.status !== 'Delivered') {
+        t.progress = Math.min(100, t.progress + 25);
+        if (t.progress >= 100) t.status = 'Delivered';
+        else if (t.progress > 30) t.status = 'In transit';
+      }
+    });
+  }
+  loadData();
+  toast('Transfer shipment simulation advanced.');
+}
+
+function openTransfer() {
+  const body = `
+    <div class="form-grid">
+      <div class="field">
+        <label>Originating Store</label>
+        <select id="trFrom">${state.facilities.map(f => `<option>${f.name}</option>`).join('')}</select>
+      </div>
+      <div class="field">
+        <label>Destination Health Centre</label>
+        <select id="trTo">${state.facilities.map(f => `<option>${f.name}</option>`).join('')}</select>
+      </div>
+      <div class="field">
+        <label>Vaccine</label>
+        <select id="trVax">${state.vaccines.map(v => `<option>${v.name}</option>`).join('')}</select>
+      </div>
+      <div class="field">
+        <label>Doses to Transfer</label>
+        <input id="trDoses" type="number" min="10" value="100">
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:16px">
+      <button onclick="submitTransfer()">Dispatch Cold-Chain Consignment</button>
+    </div>
+  `;
+  openModal('Dispatch Vaccine Transfer', 'Inter-Facility Logistics', body);
+}
+
+async function submitTransfer() {
+  const from = $('trFrom').value;
+  const to = $('trTo').value;
+  const vax = $('trVax').value;
+  const doses = $('trDoses').value;
+
+  try {
+    await fetch('/api/transfers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to, vax, doses })
+    });
+    toast('Transfer dispatched in central logistics registry!');
+  } catch (e) {
+    state.transfers.unshift({
+      id: 'TR-' + (state.transfers.length + 75),
+      from, to, vax, doses: Number(doses), progress: 0, status: 'Loading'
+    });
+    toast('Transfer added locally!');
+  }
+  closeModal();
+  loadData();
+}
+
+// Initial Data Load
+loadData();
+setInterval(loadData, 10000);
+</script>
+</body>
+</html>
